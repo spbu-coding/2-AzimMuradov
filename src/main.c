@@ -70,15 +70,12 @@ int parse_and_validate_arguments(long long **from, long long **to, char **argume
 }
 
 int scan_numbers(long long *numbers) {
-    char space;
+    char space = ' ';
     int size = 0;
 
-    do {
-        if (scanf("%lld%c", &numbers[size++], &space) != 2) {
-            errprintf("Cannot read from stdin\n");
-            return -1;
-        }
-    } while (space != '\n');
+    while (space == ' ') {
+        scanf("%lld%c", &numbers[size++], &space);
+    }
 
     return size;
 }
@@ -183,3 +180,4 @@ int set_parameter(long long **from, long long **to, char *argument, enum arg_typ
 
     return 0;
 }
+
