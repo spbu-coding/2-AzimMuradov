@@ -16,8 +16,7 @@ enum task_2_err_codes {
     TASK_2_ERR_NO_CL_ARGS = -1,
     TASK_2_ERR_TOO_MANY_CL_ARGS = -2,
     TASK_2_ERR_DUPLICATE_CL_ARGS = -3,
-    TASK_2_ERR_WRONG_CL_ARGS = -4,
-    TASK_2_ERR_OTHER = -5
+    TASK_2_ERR_WRONG_CL_ARGS = -4
 };
 
 enum arg_type {
@@ -32,7 +31,7 @@ static const char *const TO = "--to=";
 
 enum arg_type get_argument_type(char *argument);
 
-int set_parameter(long long **from, long long **to, char *argument, enum arg_type type);
+void set_parameter(long long **from, long long **to, char *argument, enum arg_type type);
 
 
 int parse_and_validate_arguments(long long **from, long long **to, char **arguments, size_t arguments_number) {
@@ -50,21 +49,8 @@ int parse_and_validate_arguments(long long **from, long long **to, char **argume
     if (arg0_type == arg1_type) return TASK_2_ERR_DUPLICATE_CL_ARGS;
 
 
-    int return_codes_sum = 0;
-    return_codes_sum += set_parameter(from, to, arg0, arg0_type);
-    return_codes_sum += set_parameter(from, to, arg1, arg1_type);
-    if (return_codes_sum != 0) {
-        if (*from != NULL) {
-            free(*from);
-            *from = NULL;
-        }
-        if (*to != NULL) {
-            free(*to);
-            *to = NULL;
-        }
-
-        return TASK_2_ERR_OTHER;
-    }
+    set_parameter(from, to, arg0, arg0_type);
+    set_parameter(from, to, arg1, arg1_type);
 
     return 0;
 }
@@ -135,7 +121,6 @@ int main(int argc, char *argv[]) {
 
     long long numbers[100];
     int numbers_size = scan_numbers(numbers);
-    if (numbers_size == -1) return TASK_2_ERR_OTHER;
 
     int app_result = run_app(numbers, numbers_size, from, to);
 
@@ -153,31 +138,20 @@ enum arg_type get_argument_type(char *argument) {
     return ARG_T_INVALID;
 }
 
-int set_parameter(long long **from, long long **to, char *argument, enum arg_type type) {
+void set_parameter(long long **from, long long **to, char *argument, enum arg_type type) {
     const long long FROM_LEN = strlen(FROM);
     const long long TO_LEN = strlen(TO);
 
     switch (type) {
         case ARG_T_FROM:
             *from = malloc(sizeof **from);
-            if (*from == NULL) {
-                errprintf("Cannot allocate memory for `from` parameter\n");
-                return -1;
-            }
             **from = strtoll(argument + FROM_LEN, NULL, 10);
             break;
         case ARG_T_TO:
             *to = malloc(sizeof **to);
-            if (*to == NULL) {
-                errprintf("Cannot allocate memory for `to` parameter\n");
-                return -1;
-            }
             **to = strtoll(argument + TO_LEN, NULL, 10);
             break;
         case ARG_T_INVALID:
             break;
     }
-
-    return 0;
 }
-
