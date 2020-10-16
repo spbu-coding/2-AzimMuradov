@@ -4,6 +4,7 @@
  * Azim Muradov, group #171
  */
 
+#include <ctype.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,15 +71,15 @@ int parse_and_validate_arguments(long long **from, long long **to, char **argume
 }
 
 int scan_numbers(long long *numbers) {
-    char space = ' ';
+    char delimiter;
     int size = 0;
 
-    while (space == ' ') {
-        if (scanf("%lld%c", &numbers[size++], &space) < 1) {
+    do {
+        if (scanf("%lld%c", &numbers[size++], &delimiter) != 2) {
             errprintf("Cannot read from stdin\n");
             return -1;
         }
-    }
+    } while (isblank(delimiter));
 
     return size;
 }
@@ -184,4 +185,5 @@ int set_parameter(long long **from, long long **to, char *argument, enum arg_typ
 
     return 0;
 }
+
 
